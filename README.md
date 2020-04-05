@@ -1,8 +1,6 @@
 # Bitcoin Mining Project
 ### [Bitcoin Mining:](http://www.righto.com/2014/02/bitcoin-mining-hard-way-algorithms.html)
-Uses hash function *double SHA-256*.
-
-[]: *A hash takes a chunk of data as input and shrinks it down into a smaller hash value (in this case 256 bits)*
+Uses hash function *double SHA-256*. The short way of explaining it is: "*A hash takes a chunk of data as input and shrinks it down into a smaller hash value (in this case 256 bits)*"
 
 To mine a block, you first :
 
