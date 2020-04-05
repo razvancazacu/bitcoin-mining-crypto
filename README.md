@@ -65,3 +65,6 @@ To mine a block, you first :
 - Multiprocess (8) iterating over the nonce values with 1000000 values per process (92.675s)
 
 _A possible faster method is using the CUDA cores from the GPU_
+
+
+#### 2. Calculate hash values using pseudo-random numbers ( current number is greater then the last used ). Verify for at least 100 000 000 nonce values or until another valid value is found (same as ex 1).
