@@ -27,6 +27,8 @@ To mine a block, you first :
  ## Problem
 #### 1. Find the Hash value with the numbers of 0 according to the given difficulty and the Nonce value between 3 000 000 000 and 3 100 000 000
 
+
+
 |  Field | Value  |  
 |---|---|
 | Version  | 0x20400000  |  
@@ -35,9 +37,16 @@ To mine a block, you first :
 |Timestamp|0x5DB8AB5E|
 |Bits|0x17148EDF|
 
+|HEX Value| Nonce|
+|---|---|
+|0x10000000| 4294967296|
+|0xB2D05E00| 3000000000|
+|0xB8C63F00| 3100000000|
 #####_Results Solution found in 92.675 seconds_
 - Nonce value: 3060331852
 - Hash value: 0000000000000000000d7612d743325d8e47cb9e506d547694478f35f736188e
+
+
 
 **_First 5 Hash values_**
 
