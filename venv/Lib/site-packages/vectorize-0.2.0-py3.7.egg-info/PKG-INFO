@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: vectorize
+Version: 0.2.0
+Summary: Vectorize functions.
+Home-page: UNKNOWN
+Author: Stijn Debrouwere
+Author-email: stijn@debrouwere.org
+License: ISC
+Download-URL: http://www.github.com/debrouwere/python-vectorize/tarball/master
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Utilities

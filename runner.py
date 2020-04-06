@@ -1,10 +1,9 @@
 import hashlib
 import struct
-import binascii
 import multiprocessing
 from time import time
 import random
-
+from numba import jit, cuda
 
 def get_target_str(bits):
     exp = bits >> 24
@@ -31,32 +30,6 @@ def verify_nonce(version, prev_block, mrkl_root,
 def find_nonce_multiproc(args):
     version, prev_block, mrkl_root, timestamp, bits_difficulty, starting_nonce, end_nonce = args
     target_str = get_target_str(bits_difficulty)
-    #   L - unsinged Long
-    #   < - little endian
-
-    while starting_nonce < end_nonce:
-        header = (struct.pack("<L", version) +
-                  bytes.fromhex(prev_block)[::-1] +
-                  bytes.fromhex(mrkl_root)[::-1] +
-                  struct.pack("<LLL", timestamp, bits_difficulty, starting_nonce))
-        hash_result = hashlib.sha256(hashlib.sha256(header).digest()).digest()
-
-        if starting_nonce % 1000000 == 0 or starting_nonce in range(3000000000, 3000000005):
-            print("[Nonce level: ", starting_nonce, ", ", bytes.hex(hash_result[::-1]), "]")
-
-        if hash_result[::-1] < target_str:
-            print("Value found -> [ Nonce value:", starting_nonce, "Hash value:", bytes.hex(hash_result[::-1]), "]")
-            return starting_nonce
-
-        starting_nonce += 1
-    return None
-
-
-def find_nonce_random(args):
-    version, prev_block, mrkl_root, timestamp, bits_difficulty, starting_nonce, end_nonce = args
-    target_str = get_target_str(bits_difficulty)
-    #   L - unsinged Long
-    #   < - little endian
 
     while starting_nonce < end_nonce:
         header = (struct.pack("<L", version) +
@@ -86,10 +59,7 @@ def proof_of_work(version,
     n_processes = 8
     batch_size = int(5.0e5)
     pool = multiprocessing.Pool(n_processes)
-
-    nonce_start = nonce
-    current_iteration = 0
-
+    start_nonce_val = nonce
     while True:
         nonce_ranges = [
             (nonce + i * batch_size, nonce + (i + 1) * batch_size)
@@ -113,14 +83,15 @@ def proof_of_work(version,
         if nonce < nonce_max_val:
             solutions_exercise_1 = start_process_pool(nonce_ranges, params, pool)
             if len(solutions_exercise_1):
-                print(start_nonce)
-                print(current_iteration)
+                print("Reached selected iteration end")
+                print("Start nonce is:", start_nonce_val)
+                print("End nonce is:", nonce)
                 return solutions_exercise_1
             nonce += n_processes * batch_size
         else:
-            print(start_nonce)
-            print(current_iteration)
-            print("Reached 1000000000 iterations")
+            print("Reached selected iteration end")
+            print("Start nonce is:", start_nonce_val)
+            print("End nonce is:", nonce)
 
             break
 
@@ -144,26 +115,34 @@ if __name__ == '__main__':
     start_nonce = 3000000000
 
     # -------  1  -------
-    # solutions = proof_of_work(version, prev_block, merkle_root, timestamp, bits_diff, start_nonce, end_nonce)
-    # print('\n'.join('%d => %s' % s for s in solutions)) # for multiple solutions found
+    solutions = proof_of_work(version, prev_block, merkle_root, timestamp, bits_diff, start_nonce, end_nonce)
+
+    # solutions = proof_of_work(version, prev_block, merkle_root, timestamp, bits_diff, 3168331852, 4294967296)
+
+    # # print('\n'.join('%d => %s' % s for s in solutions)) # for multiple solutions found
     print('Solution (ex 1) found in %.3f seconds' % (time() - start))
+    # ------ VERIF Given Ex ------
+    print("Is the given hash equal to the resulting one?:", verify_nonce(0x3fff0000,
+                                                                         "0000000000000000000140ac4688aea45aacbe7caf6aaca46f16acd93e1064c3",
+                                                                         "422458fced12693312058f6ee4ada19f6df8b29d8cac425c12f4722e0dc4aafd",
+                                                                         0x5E664C76,
+                                                                         0x17110119,
+                                                                         538463288) == "0000000000000000000d493c3c1b91c8059c6b0838e7e68fbcf8f8382606b82c")
 
-    # ------ VERIF EX 1
-    print(verify_nonce(version,
-                       version,
-                       prev_block,
-                       mrkl_root,
-                       timestamp,
-                       bits_difficulty,
-                       3060331852))
-
+    # ------ VERIF EX 1 ------
+    print("Is hashing still valid?:", verify_nonce(version,
+                                                   prev_block,
+                                                   merkle_root,
+                                                   timestamp,
+                                                   bits_diff,
+                                                   3060331852) == "0000000000000000000d7612d743325d8e47cb9e506d547694478f35f736188e")
 
     # -------  2  -------
-    # 2 ^ 32
-    # maximum_nonce_value = 4294967296 - 100000000
-    # start_nonce = random.randrange(3060331853, maximum_nonce_value)
-    # end_nonce = start_nonce + 100000000
-    # solutions = proof_of_work(version, prev_block, merkle_root, timestamp, bits_diff, start_nonce,
-    #                           end_nonce)
-    #
-    # print('Solution (ex 2) found in %.3f seconds' % (time() - start))
+    # 2 ^ 32 = 4294967296
+    maximum_nonce_value = 4294967296 - 100000000
+    start_nonce = random.randrange(3060331853, maximum_nonce_value)
+    end_nonce = start_nonce + 100000000
+    solutions = proof_of_work(version, prev_block, merkle_root, timestamp, bits_diff, start_nonce,
+                              end_nonce)
+
+    print('Solution (ex 2) found in %.3f seconds' % (time() - start))

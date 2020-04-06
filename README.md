@@ -67,4 +67,14 @@ To mine a block, you first :
 _A possible faster method is using the CUDA cores from the GPU_
 
 
-#### 2. Calculate hash values using pseudo-random numbers ( current number is greater then the last used ). Verify for at least 100 000 000 nonce values or until another valid value is found (same as ex 1).
+#### 2. Calculate hash values using a starting pseudo-random number ( starting number is greater then the nonce found ). Verify for at least 100 000 000 nonce values or until another valid value is found (same as ex 1).
+- For the second exercise I used the library function random.randrange(start,stop) to get a starting pseudo-random number.
+The range from which it will get values is **[3060331853, 4194967295]**. More exactly this is [nonce1, 2^32-1], the latter number being the maximum number a nonce can be taken since its a 32-bit (4-byte).
+
+- To be able to hash for 100000000 values, the "stop" value from the randrange is (2^32) - 100000000
+
+- The rest of the algorithm is the same as before. The algorithm will stop when a valid nonce is found or 100000000 nonce values have been tried.
+
+_For smaller values, the batch_size needs to be modified depending on the wanted number of iterations._
+
+Added a file with an example of results from a test run for ex 2.
